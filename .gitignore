@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Manim rendering artifacts and media cache
+**/media/
+**/partial_movie_files/
+**/Tex/
+**/texts/
+**/images/
+**/videos/
+
+# Ignore project test video outputs (keep repo ultra lightweight)
+projects/**/*.mp4
+!demo_project/demo_pythagoras.mp4
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment & temp files
+.env
+.venv
+env/
+venv/
+*.tmp
+*.log

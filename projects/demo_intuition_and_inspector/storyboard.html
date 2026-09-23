@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>线性代数的本质与矩阵空间形变 - 交互式故事板看板</title>
+    <style>
+        :root {
+            --bg-color: #0F1117;
+            --card-bg: #1A1D24;
+            --border-color: #2D3139;
+            --text-main: #ECEFF4;
+            --text-muted: #8892B0;
+            --primary: #3B82F6;
+            --secondary: #F97316;
+            --accent: #FBBF24;
+            --success: #10B981;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        header {
+            max-width: 1200px;
+            margin: 0 auto 32px auto;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        h1 { margin: 0; font-size: 26px; color: var(--text-main); }
+        .meta-desc { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+        .badge {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 24px;
+        }
+        .scene-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .scene-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        .card-img-wrap {
+            position: relative;
+            background-color: #000;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .scene-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            color: var(--accent);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .card-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+        }
+        .scene-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-main);
+        }
+        .dialogue-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid var(--secondary);
+            padding: 10px 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 13px;
+            color: #D8DEE9;
+        }
+        .dialogue-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--secondary);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .details-list {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .details-list li { margin-bottom: 4px; }
+        footer {
+            max-width: 1200px;
+            margin: 48px auto 0 auto;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>🎬 线性代数的本质与矩阵空间形变</h1>
+            <div class="meta-desc">交互式数学分镜故事板 | 共 1 幕场景 | 生成时间: 2026-09-23 22:26</div>
+        </div>
+        <div>
+            <span class="badge">Manim Community Engine</span>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div class="scene-card">
+            <div class="card-img-wrap">
+                <span class="scene-badge">SCENE 01</span>
+                <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='360' viewBox='0 0 640 360'><rect width='640' height='360' fill='%23121417'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%238892B0' font-family='sans-serif' font-size='18'>Frame Preview Pending</text></svg>" alt="线性代数之魂：矩阵如何扭曲空间" />
+            </div>
+            <div class="card-body">
+                <h3 class="scene-title">线性代数之魂：矩阵如何扭曲空间</h3>
+                <div class="dialogue-box">
+                    <div class="dialogue-label">口播台词 / 底部字幕</div>
+                    "矩阵绝不是死板的数字方阵，它本质上是对空间的一场连续拉伸与剪切。"
+                </div>
+                <ul class="details-list">
+                    <li>源脚本: <code>scene_01_matrix_shear.py</code></li>
+                    <li>动效机制: 基向量联动 / 网格形变 / 行列式守恒</li>
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+
+    <footer>
+        由 Antigravity manim-video 专属工作流自动生成 · 纯净工业级交付看板
+    </footer>
+</body>
+</html>

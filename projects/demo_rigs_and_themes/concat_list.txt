@@ -1,0 +1,2 @@
+file 'd:/数学教学/数学视频/mathvideo-skill/projects/demo_rigs_and_themes/media/videos/scene_01_dynamic_derivative/480p15/DynamicDerivativeScene.mp4'
+file 'd:/数学教学/数学视频/mathvideo-skill/projects/demo_rigs_and_themes/media/videos/scene_02_riemann_chalkboard/480p15/RiemannChalkboardScene.mp4'
