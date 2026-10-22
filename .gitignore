@@ -30,3 +30,24 @@ env/
 venv/
 *.tmp
 *.log
+
+# ---------------------------------------------------------------------------
+# Large local artifacts — kept out of the repo to keep it lightweight
+# ---------------------------------------------------------------------------
+
+# Nested third-party checkouts cloned under the repo root
+# (they carry their own .git, .venv and node_modules — ~1.1 GB combined)
+/lemo-opuscar/
+/xiaoma-studio/
+
+# Built skill packages — regenerate with package_skill.py
+/*.zip
+
+# Root-level scratch assets and test audio
+/assets/
+/test_kangkang.wav
+
+# Rendered output of the demo projects: master videos, temp frames, stitched scenes
+projects/**/output/
+projects/**/temp_frames/
+projects/**/temp_scenes/
