@@ -4,6 +4,7 @@ BaseMathScene & MovingCameraMathScene: 高品质数学视频标准与动态摄�
 """
 from manim import *
 import numpy as np
+from pathlib import Path
 from contextlib import contextmanager
 try:
     from layout_guard import LayoutGuard
@@ -143,6 +144,48 @@ THEMES = {
         alert="#FF0055",        # 激光警示红
         grid_color="#1F1A3A",
         is_light=False
+    ),
+    # 8. Blueprint 工程蓝图机械制图风 (解析几何/机构联动/空间向量)
+    "blueprint": DesignToken(
+        name="blueprint",
+        bg_color="#0A192F",     # 深海蓝图底
+        text_main="#E6F1FF",    # 制图浅银白
+        text_muted="#8892B0",   # 蓝图辅助灰
+        primary="#64FFDA",      # 激光电光青 (Blueprint Cyan)
+        secondary="#FBBF24",    # 标尺琥珀金
+        accent="#FF6B6B",       # 关键标注珊瑚红
+        success="#34D399",      # 检验通过绿
+        alert="#F87171",        # 尺寸公差警报红
+        grid_color="#172A45",   # 蓝图精密毫米网格
+        is_light=False
+    ),
+    # 9. Ink Wash 东方水墨古典风 (数学史/算经/古代几何/优雅推导)
+    "ink_wash": DesignToken(
+        name="ink_wash",
+        bg_color="#F4EFE6",     # 仿古生宣纸浅米底
+        text_main="#1C1917",    # 沉厚松烟浓墨
+        text_muted="#78716C",   # 宿墨淡灰
+        primary="#1E3A5F",      # 黛蓝青墨
+        secondary="#78350F",    # 赭石熟褐
+        accent="#B91C1C",       # 朱砂古印泥红 (核心顿悟点)
+        success="#2E5A36",      # 苍竹墨绿
+        alert="#991B1B",        # 焦褐朱红
+        grid_color="#E2D9CC",   # 浅茶宣纸水印线
+        is_light=True
+    ),
+    # 10. Swiss Modern 瑞士现代主义平面设计风 (集合论/形式公理/概率论)
+    "swiss_modern": DesignToken(
+        name="swiss_modern",
+        bg_color="#F0F2F5",     # 现代工业灰白
+        text_main="#0F172A",    # 极致赫尔维提卡黑
+        text_muted="#64748B",   # 建筑中性灰
+        primary="#002FA7",      # 国际克莱因蓝 (Klein Blue)
+        secondary="#FF4500",    # 国际安全橙 (Safety Orange)
+        accent="#D97706",       # 现代琥珀
+        success="#059669",      # 功能主义翡翠
+        alert="#DC2626",        # 国际警示纯红
+        grid_color="#D8DEE9",   # 瑞士模数网格
+        is_light=True
     )
 }
 
@@ -157,6 +200,9 @@ NordTheme = THEMES["nord"]
 ChalkboardTheme = THEMES["chalkboard"]
 SolarizedLightTheme = THEMES["solarized_light"]
 CyberpunkTheme = THEMES["cyberpunk_neon"]
+BlueprintTheme = THEMES["blueprint"]
+InkWashTheme = THEMES["ink_wash"]
+SwissModernTheme = THEMES["swiss_modern"]
 
 
 # ==========================================
@@ -166,6 +212,7 @@ class BaseMathScene(Scene):
     """静态机位数学动画基类 (支持动态换肤、公式高级辅助与声画毫秒级同步)"""
     DEFAULT_THEME = "3b1b_dark"
     ENABLE_VOICEOVER = False  # 是否开启真人质感 TTS 配音 (由工作流第二步决策)
+    TTS_ENGINE = "auto"       # TTS 引擎模式: "auto" | "local" (离线 SAPI) | "edge"
     VOICE_NAME = "zh-CN-YunxiNeural"
 
     def construct(self):
@@ -174,21 +221,47 @@ class BaseMathScene(Scene):
         self.voiceover_timeline = []  # 记录 [(audio_path, start_time_sec)]
         self.apply_theme(getattr(self, "theme_name", self.DEFAULT_THEME))
 
+    def tear_down(self):
+        super().tear_down()
+        import json
+        scene_name = self.__class__.__name__
+        if getattr(self, "voiceover_timeline", None):
+            out_dir = Path("media/audio_sync")
+            out_dir.mkdir(parents=True, exist_ok=True)
+            meta = {
+                "scene": scene_name,
+                "voiceovers": getattr(self, "voiceover_timeline", [])
+            }
+            with open(out_dir / f"{scene_name}_timeline.json", "w", encoding="utf-8") as f:
+                json.dump(meta, f, ensure_ascii=False, indent=2)
+
     @contextmanager
-    def voiceover(self, text, voice=None, buffer_wait=0.2):
+    def voiceover(self, text, voice=None, engine=None, buffer_wait=0.2):
         """
         声画同步上下文管理器：
         自动根据台词生成/加载真人质感配音，将动画时长与实际音频物理时长锁死。
         同时自动刷新底部字幕！
         """
+        # 沉浸式叙事台词安全守卫 (严格禁止“摄像机/运镜”等元台词泄漏进字幕与音频)
+        meta_words = ["摄像机", "摄影机", "推镜", "拉远", "横移", "镜头拉", "镜头推", "镜头移", "镜头旋转", "切镜头"]
+        found_meta = [w for w in meta_words if w in text]
+        if found_meta:
+            import warnings
+            warnings.warn(
+                f"\n[沉浸叙事防爆警告] 台词中包含了破坏沉浸感的运镜技术术语: {found_meta}！台词内容: '{text}'。\n"
+                f"解说词必须是纯粹的人文数学纪录片语言，将运镜作为无形的视听增强！",
+                UserWarning
+            )
+
         # 自动同步刷新底部字幕
         self.set_caption(text)
 
         curr_time = self.renderer.time if hasattr(self, "renderer") else 0.0
         selected_voice = voice or getattr(self, "VOICE_NAME", "zh-CN-YunxiNeural")
+        selected_engine = engine or getattr(self, "TTS_ENGINE", "auto")
 
         if getattr(self, "ENABLE_VOICEOVER", False):
-            audio_path, duration = AudioEngine.generate_speech(text, voice=selected_voice)
+            audio_path, duration = AudioEngine.generate_speech(text, voice=selected_voice, engine=selected_engine)
             self.voiceover_timeline.append((str(audio_path), curr_time))
             tracker = VoiceoverTracker(duration=duration, audio_path=audio_path)
         else:
@@ -196,9 +269,16 @@ class BaseMathScene(Scene):
             estimated_duration = max(len(text) * 0.22, 2.0)
             tracker = VoiceoverTracker(duration=estimated_duration)
 
+        start_time = self.renderer.time if hasattr(self, "renderer") else 0.0
         try:
             yield tracker
         finally:
+            end_time = self.renderer.time if hasattr(self, "renderer") else 0.0
+            elapsed = end_time - start_time
+            # 严格防重叠：若代码块内动画耗时小于配音物理时长，自动补足剩余时间
+            remaining = tracker.duration - elapsed
+            if remaining > 0.02:
+                self.wait(remaining)
             if buffer_wait > 0:
                 self.wait(buffer_wait)
 
@@ -213,7 +293,15 @@ class BaseMathScene(Scene):
         return Text(text, font=FONT_CHINESE, font_size=font_size, color=c, **kwargs)
 
     def make_math(self, tex_string, font_size=36, color=None, **kwargs):
-        """创建数学公式 (智能适配深色/浅色背景，杜绝公式隐形)"""
+        """创建数学公式 (智能适配深色/浅色背景，Unicode 汉字自动防护)"""
+        import re
+        if re.search(r'[\u4e00-\u9fa5]', tex_string):
+            import warnings
+            warnings.warn(
+                f"\n[LaTeX 编码安全警告] MathTex 中检测到中文字符: '{tex_string}'！\n"
+                f"在标准 LaTeX 编译链中这会导致崩溃。请使用 make_text() 创建中文文本，或用 VGroup 组合文字与纯 LaTeX 公式！",
+                UserWarning
+            )
         c = color if color is not None else self.theme.text_main
         return MathTex(tex_string, font_size=font_size, color=c, **kwargs)
 
@@ -258,6 +346,94 @@ class BaseMathScene(Scene):
         self.title_mobject = group
         self.play(FadeIn(group, shift=DOWN * 0.25), run_time=0.8)
         return group
+
+    set_title = play_show_title
+
+    def setup_academic_frame(self, chapter_code="ANALYSIS // CH.01", citation_text=None):
+        """
+        学术纪录片四角元信息骨架 (Four-Corner Academic Framing):
+        左上: 学科分支/章节等宽标签; 右上: 历史原著文献引注;
+        将中央 75% 视口纯粹留给数学核心证据与几何推导。
+        """
+        # 左上角章节代码 (等宽技术质感)
+        badge = self.make_text(chapter_code, font_size=15, color=self.theme.primary)
+        badge.to_corner(UL, buff=0.42)
+        dec_line = Line(LEFT * 0.2, RIGHT * 0.2, color=self.theme.primary, stroke_width=2.0).next_to(badge, LEFT, buff=0.15)
+        top_left_grp = VGroup(dec_line, badge)
+
+        frame_elements = [top_left_grp]
+
+        # 右上角学术文献出处引注 (斜体学术范)
+        if citation_text:
+            cite_txt = self.make_text(citation_text, font_size=14, color=self.theme.text_muted)
+            cite_txt.to_corner(UR, buff=0.42)
+            frame_elements.append(cite_txt)
+
+        academic_group = VGroup(*frame_elements)
+        self.play(FadeIn(academic_group, shift=DOWN * 0.15), run_time=0.6)
+        return academic_group
+
+    def play_draw_with_beacon(self, curve, run_time=2.0, beacon_color=None, beacon_radius=0.09):
+        """
+        曲线头部跟随引导光点 (Leading Focus Beacon):
+        曲线按路径长度绘制的同时，其最前沿挂载一个高亮跟随点，视线焦点毫秒级牢牢锚定！
+        """
+        color = beacon_color or self.theme.accent
+        alpha_tracker = ValueTracker(0)
+
+        # 稳健取点函数：兼容 VMobject 单曲线与 VGroup 复合组
+        def get_current_point():
+            val = max(0.0001, min(0.9999, alpha_tracker.get_value()))
+            target = curve
+            if isinstance(curve, VGroup):
+                submobs = [m for m in curve.submobjects if hasattr(m, "has_no_points") and not m.has_no_points()]
+                if not submobs:
+                    return curve.get_center()
+                # 按照子曲线均分比例定位
+                n = len(submobs)
+                idx = min(int(val * n), n - 1)
+                sub_val = (val * n) - idx
+                target = submobs[idx]
+                return target.point_from_proportion(max(0.0001, min(0.9999, sub_val)))
+            elif hasattr(target, "has_no_points") and not target.has_no_points():
+                return target.point_from_proportion(val)
+            return curve.get_center()
+
+        # 头部跟随光点 (始终吸附在曲线当前 alpha 位置)
+        beacon = always_redraw(
+            lambda: Dot(
+                point=get_current_point(),
+                radius=beacon_radius,
+                color=color
+            )
+        )
+
+        self.add(beacon)
+        self.play(
+            Create(curve, run_time=run_time, rate_func=linear),
+            alpha_tracker.animate(run_time=run_time, rate_func=linear).set_value(1.0)
+        )
+        # 绘制完成，光点渐隐融入曲线
+        self.remove(beacon)
+        return curve
+
+    def fade_to_ghost(self, *mobjects, ghost_opacity=0.22, ghost_color=None, run_time=0.6):
+        """
+        算法迭代的历史幽灵足迹 (Ghost Trails / History Fade):
+        将上一轮迭代的切线/构造线平滑退化为暗色低透明度痕迹，
+        既清晰保留逼近历史，又决不抢占当前主焦点！
+        """
+        target_color = ghost_color or self.theme.text_muted
+        animations = []
+        for mob in mobjects:
+            if isinstance(mob, (list, tuple)):
+                for sub in mob:
+                    animations.append(sub.animate.set_stroke(color=target_color, opacity=ghost_opacity))
+            else:
+                animations.append(mob.animate.set_stroke(color=target_color, opacity=ghost_opacity))
+
+        if animations:
+            self.play(*animations, run_time=run_time)
 
     def set_caption(self, text, font_size=20, color=None, max_width=11.2):
         """
@@ -309,6 +485,26 @@ class BaseMathScene(Scene):
 
     def pause(self, t=1.2):
         self.wait(t)
+
+    def read_pause(self, text_or_char_count, min_pause=1.2, max_pause=4.0):
+        """
+        基于认知心理学公式的人类阅读自适应停顿 (汲取 lemo-opuscar 与 xiaoma-studio)：
+        中文阅读节奏模型: (字数 / 4.5 + 1.0) 秒，给观众大脑留足吸收顿悟时间
+        """
+        if isinstance(text_or_char_count, (int, float)):
+            n_chars = float(text_or_char_count)
+        else:
+            n_chars = float(len(str(text_or_char_count)))
+        duration = max(min_pause, min(n_chars / 4.5 + 1.0, max_pause))
+        self.wait(duration)
+        return duration
+
+    def real_silence(self, duration=1.2):
+        """
+        顿悟前的真静音留白 (Real Silence Before the Turn)：
+        在揭晓关键证明结论、矛盾悖论爆发或 Aha! Moment 前完全静止蓄力，制造心理聚焦。
+        """
+        self.wait(duration)
 
     def scan_collisions(self, min_buff=0.10, verbose=True):
         """扫描当前场景内的所有元素，检测是否存在空间碰撞与重叠"""
@@ -396,13 +592,17 @@ class MovingCameraMathScene(MovingCameraScene, BaseMathScene):
         self.default_frame_height = self.camera_frame.height
         self.default_frame_center = np.array([0.0, 0.0, 0.0])
 
-    def camera_zoom_to(self, mobject, scale_factor=0.6, buff=0.8, run_time=1.8, rate_func=smooth):
+    def camera_zoom_to(self, target, scale_factor=0.6, buff=0.8, run_time=1.8, rate_func=smooth):
         """
-        电影级推镜 (Zoom In)：平滑将摄影机聚焦到某个局部 Mobject
+        电影级推镜 (Zoom In)：平滑将摄影机聚焦到某个局部 Mobject 或三维坐标点
         scale_factor < 1.0 为推近放大，scale_factor > 1.0 为拉远广角
         """
-        target_center = mobject.get_center()
-        target_width = max(mobject.width * (1.0 / scale_factor) + buff, 3.5)
+        if hasattr(target, "get_center"):
+            target_center = target.get_center()
+            target_width = max(target.width * (1.0 / scale_factor) + buff, 3.5)
+        else:
+            target_center = np.array(target, dtype=float)
+            target_width = self.default_frame_width * scale_factor
         
         self.play(
             self.camera_frame.animate.set_width(target_width).move_to(target_center),

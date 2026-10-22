@@ -1,117 +1,133 @@
 ---
 name: manim-video
-description: "基于 Manim 的专业数学视频制作全流程工作流：教学叙事拆解、动态分镜设计、模块化 Scene 编码、低画质快速预览与高清成片拼接。支持 3Blue1Brown 风格美学与中文排版无痛适配。"
-version: 1.0.0
+description: "基于 Manim 的专业数学视频制作全流程工作流：吸收 Lemo-Opuscar 电影导演语法与 Xiaoma-Studio 工业自检体系。涵盖教学叙事拆解、动态分镜设计、高品质声音工程（真人质感 TTS 解说/顿悟纯净真静音/环境 BGM 混流）、模块化 Scene 编码、九宫格拼图看板自检（Contact Sheet）与自动化成片体检（-14 LUFS 响度/黑帧/冻结检测）。"
+version: 2.1.0
 metadata:
-  tags: [manim, math-video, animation, 3blue1brown, education, visualization]
+  tags: [manim, math-video, animation, 3blue1brown, education, visualization, cinematic, opuscar, studio]
 ---
 
-# Manim 数学视频全流程制作指南 (Manim Video Skill)
+# 电影级数学视频全流程制作指南 (Manim Video Skill 2.1)
 
 ## 适用场景
 
 当用户提出以下需求时加载并执行此 Skill：
-- **制作数学可视化视频**：微积分、线性代数、初高等几何、概率统计、数论或物理数学动画。
-- **教学/科普视频制作**：需要将抽象晦涩的数学公式转化为 3Blue1Brown 风格直观动画。
-- **Manim 代码编写与调试**：编写高质量、防出界、中文友好的 Manim 场景脚本并渲染导出。
+- **制作数学可视化与科普视频**：微积分、线性代数、几何证明、概率统计、数论或物理数学动画。
+- **高质感科普动画片**：将抽象晦涩的数学命题转化为好莱坞纪录片级直观叙事，融合 3Blue1Brown 直觉与多元艺术媒介质感。
+- **Manim 代码编写、调试与工业体检**：编写严谨防出界、中文友好、声画毫秒级咬合、通过工业级 QA（-14 LUFS）的成片工程。
 
 ---
 
-## ⚡ 核心哲学：五步闭环制作工作流
+## ⚡ 核心哲学：导演级六步闭环制作工作流
 
-制作优质数学视频的核心在于：**“脚本为纲、用户门控、分镜定局、模块解耦、快检精修”**。
+视频质量的评价核心顺序为：**声音 (Sound) $\rightarrow$ 节奏 (Rhythm) $\rightarrow$ 镜头运镜 (Camera) $\rightarrow$ 导演调度 (Directing)**。
 
 ```mermaid
 flowchart TD
-    Step1[第 1 步: 时间轴字幕与内容脚本<br/>Script & Subtitle Timeline] --> Gate{用户审阅与改动确认<br/>User Review Gate}
-    Gate -- 确认无误 --> AudioGate{【强制询问】是否制作人声音频？<br/>Voiceover Decision Gate}
-    AudioGate -- 制作人声配音 --> VoiceYes[激活 voiceover 模式<br/>动画时长锁死音频时长]
-    AudioGate -- 纯净无声模式 --> VoiceNo[标准纯净留白模式<br/>自适应静态阅读节奏]
-    VoiceYes --> Step2[第 2 步: 动态视觉分镜<br/>Visual Storyboard]
+    Step1[第 1 步: 时间轴剧本与开场钩子<br/>Logline & Hook Timeline] --> Gate{用户审阅与改动确认<br/>User Review Gate}
+    Gate -- 确认无误 --> AudioGate{【强制询问】声音设计决策<br/>Voiceover Decision Gate}
+    AudioGate -- 真人质感配音模式 --> VoiceYes[锁定语音物理时长<br/>高保真神经网络解说]
+    AudioGate -- 纯净无声/留白模式 --> VoiceNo[自适应认知阅读节奏<br/>read_pause 心理模型]
+    VoiceYes --> Step2[第 2 步: 电影级动态分镜<br/>Director's Storyboard]
     VoiceNo --> Step2
     Step2 --> Step3[第 3 步: 模块化 Scene 编码<br/>Modular Manim Code]
-    Step3 --> Step4[第 4 步: 快检与排版质检<br/>Fast Render -ql & QA]
-    Step4 --> Step5[第 5 步: 高清导出与成片拼接<br/>Master 1080p & Stitch]
+    Step3 --> Step4[第 4 步: 拼图看板通览自检<br/>Contact Sheet QA]
+    Step4 --> Step5[第 5 步: 自动化工业级体检<br/>qa.py: 黑帧/静止/-14 LUFS]
+    Step5 --> Step6[第 6 步: 母带高清导出与无损拼接<br/>Master 1080p & Stitch]
 ```
 
-### 第 1 步：制作时间轴字幕与内容脚本（【强制】用户审核门控）
+### 第 1 步：时间轴剧本与开场钩子（【强制】用户审核门控）
 > ⚠️ **硬性红线**：严禁在未输出时间轴字幕脚本、或用户尚未确认的情况下直接开始编写 Manim 代码！
 1. 确定视频主题、受众与 **1 个核心 Aha! 顿悟点**。
-2. 使用 `templates/script_timeline_template.md` 编制逐幕时间轴表格，包含：
-   - **时间戳预估**（如 00:00 - 00:15）
-   - **口播台词 / 底部字幕**（自然口语化教学文本）
-   - **对应视觉画面与动态行为**（几何形变、公式演化、色彩标记）
-3. **输出给用户审阅**：明确提示用户检查台词逻辑、时长节奏与画面设想，并支持用户直接提出改动。
-4. **用户确认无误后**，方可进入后续制作！
+2. **设计前 2 秒动态钩子 (Hook)**：必须由动态几何冲突、反直觉悖论或正在形变的几何体开场，**严禁居中大标题淡入**！
+3. 使用 `templates/script_timeline_template.md` 编制逐幕时间轴表格，包含：时间戳预估、口播台词（下压英文斜体小字）、对应视觉画面与动态行为。
+4. **输出给用户审阅**：用户确认无误后方可进入后续环节。
 
-### 第 1.5 步：【强制询问】是否制作真人质感配音频道 (Audio Decision Gate)
-> 🎙️ **必须向用户发起明确提问**：
-- **询问内容**：“台词与脚本已确认。请问本视频是否需要生成真人质感 TTS 语音配音（微软云希沉稳男声 / 晓晓知性女声）？还是保持纯净无声教学模式？”
-- **若用户选择生成人声**：在 Scene 中声明 `ENABLE_VOICEOVER = True`，使用 `with self.voiceover("...") as tracker:`，将动画时长与实际音频物理时长 `tracker.duration` 毫秒级锁死，并在导出时调用 `AudioEngine` 混入有声成片！
-- **若用户选择纯净无声**：保持 `ENABLE_VOICEOVER = False`，动画时长按舒适阅读节奏自动计算。
+### 第 1.5 步：【强制询问】声音工程决策 (Audio Decision Gate)
+> 🎙️ **向用户发起明确提问**：
+- **询问内容**：“台词与脚本已确认。请问本视频是否需要生成真人质感 TTS 语音配音（本地 VoxCPM2 48kHz 沉稳男声 / 微软云扬播音级男声 / 晓晓知性女声）？是否混入优雅舒适的环境 BGM 衬底？还是保持纯净无声教学模式？”
+- **若选择人声配音**：声明 `ENABLE_VOICEOVER = True`，动画时长毫秒级锁死配音实际时长；
+- **【硬性红线】全片音色单一性**：无特殊多角色演绎需求，**全片所有分幕（Act 1 ~ Act N）必须严格使用完全相同的单一音色与引擎贯穿始终**，杜绝音色跳变与质感割裂！
+- **若选择纯净无声**：保持 `ENABLE_VOICEOVER = False`，调用 `self.read_pause(text)` 依据中文字数心理认知模型自适应留白。
 
-### 第 2 步：动态视觉分镜设计 (Visual Storyboard)
-1. 基于用户确认的脚本，细化具体的坐标布局与视觉锚点。
+### 第 2 步：电影级动态分镜设计 (Director's Storyboard)
+1. 使用 `templates/storyboard_template.md` 细化分镜。
 2. 拆分为 **3 ~ 5 个独立分幕 (Scenes)**，每幕独立为一个 Scene 类。
-3. 严格规划屏幕空间（左侧几何、右侧公式、顶部标题、底部字幕）。
+3. 遵循 **“不剪，变”** 原则：通过形变（Morphing）、推镜穿越（Zoom-through）或泛洪遮罩实现幕间转场，杜绝生硬硬切。
+4. 规划每部片至少 1 个**标志性镜头 (Signature Shot)**（如微观到宏观的尺度拉远 Scale Reveal）。
 
 ### 第 3 步：模块化 Manim 编码
-1. **基类与运镜选择**：
-   - 常规静态机位：继承 `BaseMathScene`；
-   - 电影级推拉摇移（纪录片质感）：继承 `MovingCameraMathScene`，使用 `camera_zoom_to()`、`camera_pan_to()`、`camera_reset()` 引导视线。
-2. **全局多主题一键换肤**：
-   - 场景内直接指定 `DEFAULT_THEME = "claude_light"` 或 `"3b1b_dark"` 或 `"claude_dark"`；
-   - 公式使用 `self.make_math()` 自动适配深浅背景反色，绝无白底白字隐形问题。
-3. 依据审核确定的字幕内容调用 `self.set_caption("...")`，严丝合缝匹配台词。
-4. 严格遵守安全视口（$X \in [-6.0, 6.0]$，$Y \in [-3.2, 3.2]$）。
-5. 关键动画后设置合理的停顿（`self.pause(1.2)`），符合人类心智吸收节奏。
+1. **媒介艺术主题选择**：
+   - 经典暗黑几何：`"3b1b_dark"`
+   - 剑桥学刊象牙米纸：`"claude_light"`
+   - 工程蓝图机械制图：`"blueprint"`
+   - 东方算经宣纸水墨：`"ink_wash"`
+   - 现代主义网格平面：`"swiss_modern"`
+   - 常春藤大学黑板粉笔：`"chalkboard"`
+2. **导演语法调用**：
+   - 公式认知留白：`self.read_pause("公式或台词")`；
+   - 顿悟前真静音蓄力：`self.real_silence(1.2)`（无声胜有声，纯净无杂音思考聚焦）。
+3. **安全视口与布局守卫**：
+   - 严格保留在视口内（$X \in [-6.0, 6.0]$，$Y \in [-3.2, 3.2]$）；
+   - 随时调用 `self.scan_collisions()` 检测元素碰撞重叠。
 
-### 第 4 步：快检预览与自动化排版质检 (Fast QA)
-1. 使用低画质极速渲染单幕（只需 2~5 秒）：
+### 第 4 步：九宫格拼图看板通览自检 (Contact Sheet QA)
+> 📸 **汲取 Xiaoma-Studio 核心精髓：先看拼图再出片！**
+1. 无需整片反复重播，使用极速切片拼图脚本：
    ```bash
-   python -m manim render scene_01.py Scene01Intro -ql
+   # <SKILL_DIR> = 本 skill 的 base directory（加载时由 loader 告知的绝对路径）
+   python "<SKILL_DIR>/scripts/contact_sheet.py" --video out/preview.mp4 -n 9 -o out/contact_sheet.png
    ```
-2. 或输出最后一帧验证排版重叠：
-   ```bash
-   python -m manim render -s scene_01.py Scene01Intro
-   ```
-3. 质检检查项：文字出界切边、旧图层未清理、动画怪异撕裂。
+2. 一眼通览全片 9/12 宫格：检阅全片色彩一致性、文字视觉层级、公式是否贴边出界。
 
-### 第 5 步：高清全量导出与一键拼接 (Master & Stitch)
-1. 使用 `render_manager.py` 一键全量高清渲染并无损拼接：
+### 第 5 步：工业级全自动体检 (Automated QA Audit)
+1. 运行 `qa.py` 自动化体检：
    ```bash
-   python skills/manim-video/scripts/render_manager.py --action pipeline --quality h --scenes scene_01.py:Scene01Intro scene_02.py:Scene02Proof --output my_math_video.mp4
+   # <SKILL_DIR> 同上
+   python "<SKILL_DIR>/scripts/qa.py" out/video.mp4
    ```
-2. 得到最终完整成片。
+2. 自动化体检四道防线：
+   - **黑帧检测**：0 处未解释的渲染丢失黑帧；
+   - **卡死检测**：0 处超过 3 秒的无响应死帧；
+   - **响度审计**：集成响度严格保持在 **-14 LUFS**（容差 $\pm 2$ dB）；
+   - **规格审计**：标准 1080p 分辨率与稳定帧率。
+
+### 第 6 步：高清母带导出与成片拼接 (Master & Stitch)
+1. 使用 `render_manager.py` 一键全量 1080p 导出并无损拼接。
+2. 调用 `AudioEngine.mix_scene_audio` 或 `AudioEngine.add_bgm_to_video(..., normalize_loudness=True)` 导出终极成片。
 
 ---
 
-## 🔴 严格规则与防御准则 (Must Follow)
+9. **version: 2.4.0**
 
-0. **【首要硬规则】脚本未审不写代码**：在开始写任何 Manim 代码之前，必须先制作时间轴字幕与内容脚本给用户审核，用户确认无误后方可推进。
-0.5. **【硬规则·音频决策门控】时间轴过审后必须询问是否制作人声音频**：在时间轴脚本审核通过后，必须向用户明确询问：“*请问本视频是否需要生成真人质感 TTS 语音配音？还是保持纯净无声教学模式？*” 严禁未经询问擅自决定有声或无声。
-1. **禁止把长视频写在单个 Scene 里**：必须解耦为 `scene_01.py`, `scene_02.py`... 独立类，便于快速微调单个分幕。
-2. **禁止纯黑背景**：使用现代深色背景 `#121417`，避免视神经疲劳。
-3. **中文排版首选 `Text`**：由于 LaTeX 中文配置各异，中文字幕与解说文本强制使用 `Text(..., font="Microsoft YaHei")`。
-4. **公式严禁溢出**：长公式渲染后必须检查宽度，必要时调用 `formula.scale_to_fit_width(10)`。
-5. **动态几何用 `ValueTracker`**：切线、动点、变参一律用 `ValueTracker` + `always_redraw` 驱动，杜绝每帧重复创建对象。
-6. **环境依赖自检**：在执行前可随时运行 `python skills/manim-video/scripts/check_env.py` 诊断环境。
+## 🎬 十一大导演铁律 (Director's Rules)
+
+1. **黄金前 2 秒必动**：前 2 秒必须有几何物件在运动/旋转/形变，杜绝“渐变底+居中标题淡入”开场。
+2. **不剪，变**：减少生硬切镜头，通过几何形变、摄像机穿越和遮罩流转衔接前后概念。
+3. **一底、一字、一强调色**：一个主底色、一个主字色、一个核心顿悟高光色，杜绝杂乱高饱和调色。
+4. **快动作，慢意义**：动画形变可以快（0.8~1.2s），但其数学内涵必须留够停顿时间（`read_pause`）供观众吸收。
+5. **顿悟前的真静音 (Real Silence)**：在关键证明最后一块拼上、或真相揭晓前，必须有一次彻底的静音留白（1~1.5s），纯净无杂音，让观众大脑完全聚焦思考。
+6. **标志性镜头 (Signature Shot)**：每部片必须规划一个让人拍案叫绝的镜头（一镜到底、超限拉伸、微观推镜）。
+7. **首尾呼应 (Closing Echo)**：最后一帧必须呼应第一帧抛出的几何对象或直觉悖论，形成认知闭环。
+8. **纯数学沉浸叙事（绝对禁止元技术台词）**：配音解说词与字幕严禁出现任何“摄影机、摄像机、推镜、拉远、横移”等破壁技术术语！运镜应是幕后无形的直觉引导工具，语言必须 100% 聚焦数学、物理与几何的内在诗意。
+9. **LaTeX 纯净原则**：`make_math` 严禁夹带中文字符（中文用 `make_text`，两者通过 `VGroup` 组合），防止 Windows LaTeX 编译器崩溃。
+10. **全程音色绝对统一原则 (Timbre Consistency Rule)**：无特殊情景对话或用户明确要求，**全片所有分幕（Act 1 ~ Act N）必须严格采用完全相同的单一音色与引擎贯穿始终**！严禁中途男女声跳变或不同引擎音质割裂，确保整部影片的纪录片叙事声场纯粹、恒定、沉稳。
+11. **数学求真原则（拒绝华而不实的抒情散文）**：严禁在解说词中使用“丈量旅程”、“命运羁绊”、“微观切线在连续流动”、“平滑连续的灵魂”等空洞、煽情、浮夸的辞藻！解说必须完全遵从 3Blue1Brown 的数学理性风格：使用直白、朴素、严密的数学语言，紧扣定义假设、差商代数含义、切线几何倾角与逻辑推导必然性。以数学逻辑的纯粹力量打动人，拒绝虚浮煽情。
 
 ---
 
 ## 🛠️ 工具箱资源索引
 
-- **通用基类 (7大美学主题、电影级运镜、3D HUD 与 voiceover 语画同步)**：[base_scene.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/base_scene.py)
-- **电影级着色与光效材质引擎 (GlowEngine, AhaGlow, ParticleStreamRig)**：[visual_fx.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/visual_fx.py)
-- **声音设计与语音合成引擎**：[audio_engine.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/audio_engine.py)
-- **高阶数学 Rig 交互装置与 3D 曲面组件库**：[math_rigs.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/math_rigs.py)
-- **智能排版与包围盒碰撞重叠检测器**：[layout_guard.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/layout_guard.py)
-- **时间轴与字幕审核模板**：[script_timeline_template.md](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/script_timeline_template.md)
-- **分镜设计模板**：[storyboard_template.md](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/templates/storyboard_template.md)
-- **环境诊断工具**：[check_env.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/scripts/check_env.py)
-- **毫秒级单帧切片质检工具**：[fast_inspector.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/scripts/fast_inspector.py)
-- **交互式 Web 故事板看板生成器**：[storyboard_generator.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/scripts/storyboard_generator.py)
-- **批量渲染拼接器**：[render_manager.py](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/scripts/render_manager.py)
-- **审美与色彩指南**：[color_and_typography.md](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/references/color_and_typography.md)
-- **避坑指南**：[common_pitfalls.md](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/references/common_pitfalls.md)
-- **常用数学动画模式**：[math_animation_patterns.md](file:///d:/数学教学/数学视频/mathvideo-skill/skills/manim-video/references/math_animation_patterns.md)
+- **基类与艺术媒介库 (10大美学主题、电影级运镜、真静音与认知停顿)**：[base_scene.py](templates/base_scene.py)
+- **声学引擎与配音混流压制 (本地离线 TTS/SAPI, Edge-TTS 神经网络解说, ACE-Step 基础音乐模型调度, -14 LUFS 响度标准化)**：[audio_engine.py](templates/audio_engine.py)
+  - **本地离线 TTS**：支持设置 `TTS_ENGINE = "local"`，利用本地 Windows 原生 SAPI 5 毫秒级生成离线解说音频，零外网依赖；
+  - **ACE-Step 音乐模型**：封装 `ACEStepMusic` 调度器，支持通过 `POST /release_task` 对接官方本地扩散模型服务，提供专用学术纪录片氛围 Prompt，并内置离线优雅和声伴奏无缝降级。
+- **拼图看板生成器 (Contact Sheet 一眼通览全片)**：[contact_sheet.py](scripts/contact_sheet.py)
+- **成片自动化体检器 (QA: 黑帧/冻结/-14 LUFS 响度质检)**：[qa.py](scripts/qa.py)
+- **毫秒级单帧切片质检工具**：[fast_inspector.py](scripts/fast_inspector.py)
+- **导演动态分镜模版 (含三层声学表与导演自查清单)**：[storyboard_template.md](templates/storyboard_template.md)
+- **时间轴与字幕审核模版**：[script_timeline_template.md](templates/script_timeline_template.md)
+- **批量渲染与拼接管理器**：[render_manager.py](scripts/render_manager.py)
+- **交互式 Web 故事板看板生成器**：[storyboard_generator.py](scripts/storyboard_generator.py)
+- **排版碰撞与视口边界守卫**：[layout_guard.py](templates/layout_guard.py)
+- **高阶数学装置与 3D 曲面库**：[math_rigs.py](templates/math_rigs.py)
+- **极简电影级着色与光效引擎**：[visual_fx.py](templates/visual_fx.py)
